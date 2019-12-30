@@ -1,0 +1,7 @@
+open file
+parse through it and get relevant information
+calculate intensity
+create a plot intensity vs 2Theta
+create a folder and export the plot into it
+
+find phase

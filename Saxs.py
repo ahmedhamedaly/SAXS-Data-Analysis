@@ -165,6 +165,12 @@ def latticeParameter(p):
     return lp
 
 
+# Stats = meansAndStd(Lattice parameter, ratios)
+# @Parameters: Lattice parameter, Ratios
+# @Returns: Average and Standard Deviation
+# Gets the mean and average of the data
+
+
 def meanAndStd(lp, r):
     text = []
     for key, value in lp.items():
@@ -260,13 +266,17 @@ root = tk.Tk()
 root.withdraw()
 # file = filedialog.askopenfile(parent=root, mode='r', title='Choose a file', filetypes=[('Data File', '*.xye')])
 
+# Opening up the files
 files = filedialog.askopenfilenames(parent=root, title='Choose a file', filetypes=[('Data File', '*.xye')])
+
+# Splitting the files
 file = root.tk.splitlist(files)
 
 for f in files:
 
     file = open(f, 'r')
 
+    # Dict of printed phases
     printed = {
         "l": 0,
         "h": 0,
@@ -279,19 +289,27 @@ for f in files:
         # tk.messagebox.showinfo("Empty File", "You added an empty file with nothing inside.")
         exit(1)
 
+    # The file name
     nameFile = os.path.splitext(os.path.basename(file.name))[0]
+
+    # The directory the file will be saved to
     dirFile = os.path.dirname(file.name)
+
+    # Determines the name of the save file
     if len(files) > 1:
         saveFile = dirFile + '/' + 'Result.pdf'
     else:
         saveFile = dirFile + '/' + nameFile + '_Result.pdf'
 
+    # Title of the file
     title = [
         nameFile
     ]
 
+    # The data  from the file
     data = file.readlines()
 
+    # Necessary information for the data
     angle = []
     intensity = []
     resolution = []
@@ -320,17 +338,23 @@ for f in files:
     # Showing Plot
     # plt.show()
 
+    # Determine the peaks given the angle, intensity and resolution
     peaks = peak(angle, intensity, resolution)
 
+    # Determine the 3 ratios given the peaks
     ratios1, ratios2, ratios3 = ratio(peaks)
 
+    # Starts a pdf file and adds a page
     pdf = FPDF()
     pdf.add_page()
 
+    # The title of the pdf
     pdf.set_font("Times", "BU", 12)
     write(title, 'C')
     pdf.set_font('Times', "", 18.0)
     write(newLine, 'L')
+
+    # --------------------------------------------
 
     phases1 = phase(ratios1)
     latticeParameters = latticeParameter(phases1)
@@ -343,6 +367,8 @@ for f in files:
     phases3 = phase(ratios3)
     latticeParameters3 = latticeParameter(phases3)
     meanAndStd(latticeParameters3, 3)
+
+    # --------------------------------------------
 
     # Save the figure
     fig.savefig("page1.pdf")

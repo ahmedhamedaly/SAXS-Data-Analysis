@@ -176,8 +176,8 @@ def meanAndStd(lp, r):
     for key, value in lp.items():
         if printed[key] == 0 and len(value) >= 3 and key != 'h':
             printed[key] = 1
-            a = statistics.mean(value)
-            s = statistics.stdev(value)
+            a = round(statistics.mean(value), 3)
+            s = round(statistics.stdev(value), 3)
             text.append(f"Ratio: {r}")
             text.append(f"phase: {key}")
             text.append(f"Average: {a}")
@@ -189,8 +189,8 @@ def meanAndStd(lp, r):
     for key, value in lp.items():
         if printed[key] == 0 and len(value) == 3 and key == 'h':
             printed[key] = 1
-            a = statistics.mean(value)
-            s = statistics.stdev(value)
+            a = round(statistics.mean(value), 3)
+            s = round(statistics.stdev(value), 3)
             text.append(f"Ratio: {r}")
             text.append(f"phase: {key}")
             text.append(f"Average: {a}")
@@ -200,8 +200,8 @@ def meanAndStd(lp, r):
             return
         elif printed[key] == 0 and len(value) == 2 and key == 'l':
             printed[key] = 1
-            a = statistics.mean(value)
-            s = statistics.stdev(value)
+            a = round(statistics.mean(value), 3)
+            s = round(statistics.stdev(value), 3)
             text.append(f"Ratio: {r}")
             text.append(f"phase: {key}")
             text.append(f"Average: {a}")
@@ -324,16 +324,20 @@ for f in files:
         # Y axis: line[1] = intensity
         intensity.append(float(line[1]))
         # resolution = 0.984081/(2*(Sin(2Θ)))
-        resolution.append(0.984081 / (2 * (math.sin(math.radians(float(line[0]))))))
+        resolution.append(0.984081 / (2 * (math.sin(math.radians(float(line[0])/2)))))
 
     # Figure of plot
     fig = plt.figure()
 
-    plt.plot(angle, intensity)
+    # Plotting with thin line width
+    plt.plot(angle, intensity, linewidth=0.75)
 
     # Labeling axis
     plt.xlabel("Angle (2Θ)")
     plt.ylabel("Intensity")
+
+    # Show grid
+    plt.grid(True)
 
     # Showing Plot
     # plt.show()

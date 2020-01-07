@@ -181,7 +181,7 @@ def meanAndStd(lp, r):
             text.append(f"Ratio: {r}")
             text.append(f"phase: {key}")
             text.append(f"Average: {a}")
-            text.append(f"Std: {s}")
+            text.append(f"Standard Deviation: {s}")
             write(text, 'L')
             write(newLine, 'L')
             return
@@ -194,7 +194,7 @@ def meanAndStd(lp, r):
             text.append(f"Ratio: {r}")
             text.append(f"phase: {key}")
             text.append(f"Average: {a}")
-            text.append(f"Std: {s}")
+            text.append(f"Standard Deviation: {s}")
             write(text, 'L')
             write(newLine, 'L')
             return
@@ -205,15 +205,15 @@ def meanAndStd(lp, r):
             text.append(f"Ratio: {r}")
             text.append(f"phase: {key}")
             text.append(f"Average: {a}")
-            text.append(f"Std: {s}")
+            text.append(f"Standard Deviation: {s}")
             write(text, 'L')
             write(newLine, 'L')
             return
 
 
 def write(t, a):
-    for i in t:
-        pdf.cell(ln=3, h=6.5, align=a, w=0, txt=i, border=100)
+    for x in t:
+        pdf.cell(ln=3, h=6.5, align=a, w=0, txt=x, border=100)
 
 
 phasesDict = {
@@ -369,8 +369,8 @@ for f in files:
     # --------------------------------------------
 
     phases1 = phase(ratios1)
-    latticeParameters = latticeParameter(phases1)
-    meanAndStd(latticeParameters, 1)
+    latticeParameters1 = latticeParameter(phases1)
+    meanAndStd(latticeParameters1, 1)
 
     phases2 = phase(ratios2)
     latticeParameters2 = latticeParameter(phases2)
@@ -383,7 +383,7 @@ for f in files:
     # --------------------------------------------
 
     # Save the figure
-    fig.savefig("page1.pdf")
+    fig.savefig('page1.pdf')
 
     pdf.output('page2.pdf', 'F')
 

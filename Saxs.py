@@ -317,6 +317,7 @@ for f in files:
     for line in data:
         line = (" ".join((line.split()))).split()
         # Keep X axis to 3
+        # TODO
         if float(line[0]) > 3:
             break
         # X axis: line[0] = angle (2Θ)
@@ -329,10 +330,17 @@ for f in files:
     # Figure of plot
     fig = plt.figure()
 
+    # Normalising the y axis to max of 1
+    normIntensity = []
+    for i in intensity:
+        normIntensity.append((i - min(intensity)) / (max(intensity) - min(intensity)))
+
     # Plotting with thin line width
-    plt.plot(angle, intensity, linewidth=0.75)
+    plt.plot(angle, normIntensity, linewidth=0.75)
+    # plt.plot(angle, intensity, linewidth=0.75)
 
     # Labeling axis
+    plt.title("Angle (2Θ) vs Intensity")
     plt.xlabel("Angle (2Θ)")
     plt.ylabel("Intensity")
 

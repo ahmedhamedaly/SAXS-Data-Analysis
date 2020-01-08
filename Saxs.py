@@ -16,15 +16,17 @@ from PyPDF2 import PdfFileMerger
 
 def peak(a, i, r):
     peakList = []
+    peakCoords = []
     for index in range(len(i)):
         # finds a peak in the y axis
         try:
             if i[index] > i[index - 1] > i[index - 2] > i[index - 3] > i[index - 4] and i[index] > i[index + 1] > i[index + 2] > i[index + 3] > i[index + 4]:
                 # Adds the peaks to a list
                 peakList.append((a[index], r[index]))
+                peakCoords.append((a[index], i[index]))
         except IndexError:
             print("Peak fucked up...")
-    return peakList
+    return peakList, peakCoords
 
 # ratios = ratio(peaks)
 # @Parameters: peaks
@@ -32,8 +34,10 @@ def peak(a, i, r):
 # Assigns the first peak as 1 as find the ratio of the rest
 
 
-def ratio(p):
+def ratio(p, cp):
     ratioList1 = []
+    coordPeak1 = []
+
     # First Ratio
     r1 = 0
     for index in range(len(p)):
@@ -42,12 +46,15 @@ def ratio(p):
             r1 = p[index][0]
             # Assigns the first ratio to 1
             ratioList1.append((1, p[index][1]))
+            coordPeak1.append(cp[index])
         else:
             # Rounds the ratio to 2 decimal points
             r = round(p[index][0] / r1, 2)
             ratioList1.append((r, p[index][1]))
+            coordPeak1.append(cp[index])
 
     ratioList2 = []
+    coordPeak2 = []
     r2 = 0
     for index in range(len(p)):
         if index == 0:
@@ -55,11 +62,14 @@ def ratio(p):
         elif index == 1:
             r2 = p[index][0]
             ratioList2.append((1, p[index][1]))
+            coordPeak2.append(cp[index])
         else:
             r = round(p[index][0] / r2, 2)
             ratioList2.append((r, p[index][1]))
+            coordPeak2.append(cp[index])
 
     ratioList3 = []
+    coordPeak3 = []
     r3 = 0
     for index in range(len(p)):
         if index == 0 or index == 1:
@@ -67,11 +77,13 @@ def ratio(p):
         elif index == 2:
             r3 = p[index][0]
             ratioList3.append((1, p[index][1]))
+            coordPeak3.append(cp[index])
         else:
             r = round(p[index][0] / r3, 2)
             ratioList3.append((r, p[index][1]))
+            coordPeak3.append(cp[index])
 
-    return ratioList1, ratioList2, ratioList3
+    return ratioList1, ratioList2, ratioList3, coordPeak1, coordPeak2, coordPeak3
 
 
 # phases = phase(ratios)
@@ -80,7 +92,7 @@ def ratio(p):
 # Takes the ratio and maps it to a phase
 
 
-def phase(r):
+def phase(r, cp):
     phaseList = {
         "l": [],
         "h": [],
@@ -89,8 +101,16 @@ def phase(r):
         "fi": []
     }
 
+    coordsList = {
+        "l": [],
+        "h": [],
+        "ia3d": [],
+        "pn3m": [],
+        "fi": []
+    }
+
     # Characteristic Value in Ratios
-    for cv in r:
+    for index, cv in enumerate(r):
         for key, values in phasesDict.items():
             # Checks the phase
             if key == 'l':
@@ -100,6 +120,7 @@ def phase(r):
                         # Creates a tuple of the resolution and hkl
                         tmp = (cv[1], phaseMiller[key][value])
                         phaseList[key].append(tmp)
+                        coordsList[key].append(cp[index])
 
             if key == 'h':
                 for value in values:
@@ -108,26 +129,30 @@ def phase(r):
                         # Creates a tuple of the resolution and hkl
                         tmp = (cv[1], phaseMiller[key][value])
                         phaseList[key].append(tmp)
+                        coordsList[key].append(cp[index])
 
             if key == 'ia3d':
                 for value in values:
                     if abs(cv[0] - value) <= 0.025:
                         tmp = (cv[1], phaseMiller[key][value])
                         phaseList[key].append(tmp)
+                        coordsList[key].append(cp[index])
 
             if key == 'pn3m':
                 for value in values:
                     if abs(cv[0] - value) <= 0.025:
                         tmp = (cv[1], phaseMiller[key][value])
                         phaseList[key].append(tmp)
+                        coordsList[key].append(cp[index])
 
             if key == 'fi':
                 for value in values:
                     if abs(cv[0] - value) <= 0.025:
                         tmp = (cv[1], phaseMiller[key][value])
                         phaseList[key].append(tmp)
+                        coordsList[key].append(cp[index])
 
-    return phaseList
+    return phaseList, coordsList
 
 
 # lps = latticeParameter(phases)
@@ -171,7 +196,7 @@ def latticeParameter(p):
 # Gets the mean and average of the data
 
 
-def meanAndStd(lp, r):
+def meanAndStd(lp, r, c):
     text = []
     for key, value in lp.items():
         if printed[key] == 0 and len(value) >= 3 and key != 'h':
@@ -182,8 +207,18 @@ def meanAndStd(lp, r):
             text.append(f"phase: {key}")
             text.append(f"Average: {a}")
             text.append(f"Standard Deviation: {s}")
+            text.append(f"Peak Coordinates: ")
+            coordsList = [str(coord) for coord in c[key]]
+
             write(text, 'L')
+            pdf.set_font('Times', "", 12.0)
+
+            for coord in coordsList:
+                pdf.cell(ln=3, h=6.5, align=a, w=0, txt=coord, border=100)
+
+            pdf.set_font('Times', "", 18.0)
             write(newLine, 'L')
+
             return
 
     for key, value in lp.items():
@@ -195,8 +230,18 @@ def meanAndStd(lp, r):
             text.append(f"phase: {key}")
             text.append(f"Average: {a}")
             text.append(f"Standard Deviation: {s}")
+            text.append(f"Peak Coordinates: ")
+            coordsList = [str(coord) for coord in c[key]]
+
             write(text, 'L')
+            pdf.set_font('Times', "", 12.0)
+
+            for coord in coordsList:
+                pdf.cell(ln=3, h=6.5, align=a, w=0, txt=coord, border=100)
+
+            pdf.set_font('Times', "", 18.0)
             write(newLine, 'L')
+
             return
         elif printed[key] == 0 and len(value) == 2 and key == 'l':
             printed[key] = 1
@@ -206,8 +251,18 @@ def meanAndStd(lp, r):
             text.append(f"phase: {key}")
             text.append(f"Average: {a}")
             text.append(f"Standard Deviation: {s}")
+            text.append(f"Peak Coordinates: ")
+            coordsList = [str(coord) for coord in c[key]]
+
             write(text, 'L')
+            pdf.set_font('Times', "", 12.0)
+
+            for coord in coordsList:
+                pdf.cell(ln=3, h=6.5, align=a, w=0, txt=coord, border=100)
+
+            pdf.set_font('Times', "", 18.0)
             write(newLine, 'L')
+
             return
 
 
@@ -272,6 +327,20 @@ files = filedialog.askopenfilenames(parent=root, title='Choose a file', filetype
 # Splitting the files
 file = root.tk.splitlist(files)
 
+# How far the cut off of the x Axis is
+cut = 3
+
+try:
+    firstFile = os.path.splitext(os.path.basename(files[0]))[0]
+    if firstFile.startswith('-'):
+        firstFile.replace('-', '')
+        cut = abs(int(firstFile))
+        files = files[1:]
+except IndexError:
+    print("exit")
+    exit(1)
+
+
 for f in files:
 
     file = open(f, 'r')
@@ -316,9 +385,8 @@ for f in files:
 
     for line in data:
         line = (" ".join((line.split()))).split()
-        # Keep X axis to 3
-        # TODO
-        if float(line[0]) > 3:
+        # Keep X axis to 3 by default of as said
+        if float(line[0]) > cut:
             break
         # X axis: line[0] = angle (2Θ)
         angle.append(float(line[0]))
@@ -350,11 +418,11 @@ for f in files:
     # Showing Plot
     # plt.show()
 
-    # Determine the peaks given the angle, intensity and resolution
-    peaks = peak(angle, intensity, resolution)
+    # Determine the peaks given the angle, intensity and resolution and coords of them
+    peaks, coordPeaks = peak(angle, intensity, resolution)
 
     # Determine the 3 ratios given the peaks
-    ratios1, ratios2, ratios3 = ratio(peaks)
+    ratios1, ratios2, ratios3, coordPeak1, coordPeak2, coordPeak3 = ratio(peaks, coordPeaks)
 
     # Starts a pdf file and adds a page
     pdf = FPDF()
@@ -368,17 +436,17 @@ for f in files:
 
     # --------------------------------------------
 
-    phases1 = phase(ratios1)
+    phases1, coords = phase(ratios1, coordPeak1)
     latticeParameters1 = latticeParameter(phases1)
-    meanAndStd(latticeParameters1, 1)
+    meanAndStd(latticeParameters1, 1, coords)
 
-    phases2 = phase(ratios2)
+    phases2, coords = phase(ratios2, coordPeak2)
     latticeParameters2 = latticeParameter(phases2)
-    meanAndStd(latticeParameters2, 2)
+    meanAndStd(latticeParameters2, 2, coords)
 
-    phases3 = phase(ratios3)
+    phases3, coords = phase(ratios3, coordPeak3)
     latticeParameters3 = latticeParameter(phases3)
-    meanAndStd(latticeParameters3, 3)
+    meanAndStd(latticeParameters3, 3, coords)
 
     # --------------------------------------------
 

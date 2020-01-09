@@ -28,6 +28,7 @@ def peak(a, i, r):
             print("Peak fucked up...")
     return peakList, peakCoords
 
+
 # ratios = ratio(peaks)
 # @Parameters: peaks
 # @Return: ratioList
@@ -36,7 +37,7 @@ def peak(a, i, r):
 
 def ratio(p, cp):
     ratioList1 = []
-    coordPeak1 = []
+    coordPeakList1 = []
 
     # First Ratio
     r1 = 0
@@ -46,15 +47,15 @@ def ratio(p, cp):
             r1 = p[index][0]
             # Assigns the first ratio to 1
             ratioList1.append((1, p[index][1]))
-            coordPeak1.append(cp[index])
+            coordPeakList1.append(cp[index])
         else:
             # Rounds the ratio to 2 decimal points
             r = round(p[index][0] / r1, 2)
             ratioList1.append((r, p[index][1]))
-            coordPeak1.append(cp[index])
+            coordPeakList1.append(cp[index])
 
     ratioList2 = []
-    coordPeak2 = []
+    coordPeakList2 = []
     r2 = 0
     for index in range(len(p)):
         if index == 0:
@@ -62,14 +63,14 @@ def ratio(p, cp):
         elif index == 1:
             r2 = p[index][0]
             ratioList2.append((1, p[index][1]))
-            coordPeak2.append(cp[index])
+            coordPeakList2.append(cp[index])
         else:
             r = round(p[index][0] / r2, 2)
             ratioList2.append((r, p[index][1]))
-            coordPeak2.append(cp[index])
+            coordPeakList2.append(cp[index])
 
     ratioList3 = []
-    coordPeak3 = []
+    coordPeakList3 = []
     r3 = 0
     for index in range(len(p)):
         if index == 0 or index == 1:
@@ -77,19 +78,19 @@ def ratio(p, cp):
         elif index == 2:
             r3 = p[index][0]
             ratioList3.append((1, p[index][1]))
-            coordPeak3.append(cp[index])
+            coordPeakList3.append(cp[index])
         else:
             r = round(p[index][0] / r3, 2)
             ratioList3.append((r, p[index][1]))
-            coordPeak3.append(cp[index])
+            coordPeakList3.append(cp[index])
 
-    return ratioList1, ratioList2, ratioList3, coordPeak1, coordPeak2, coordPeak3
+    return ratioList1, ratioList2, ratioList3, coordPeakList1, coordPeakList2, coordPeakList3
 
 
-# phases = phase(ratios)
-# @Parameters: ratios
+# phases = phase(ratios, coordpeaks)
+# @Parameters: ratios, coordpeaks
 # @Returns: phaseList
-# Takes the ratio and maps it to a phase
+# Takes the ratio and maps it to a phase and also the peaks of each phase
 
 
 def phase(r, cp):
@@ -190,10 +191,10 @@ def latticeParameter(p):
     return lp
 
 
-# Stats = meansAndStd(Lattice parameter, ratios)
-# @Parameters: Lattice parameter, Ratios
-# @Returns: Average and Standard Deviation
-# Gets the mean and average of the data
+# Stats = meansAndStd(Lattice parameter, ratios, coords)
+# @Parameters: Lattice parameter, Ratios, Coords
+# @Returns: Average and Standard Deviation and peak coords
+# Gets the mean and average of the data and the peak coords
 
 
 def meanAndStd(lp, r, c):
@@ -266,6 +267,12 @@ def meanAndStd(lp, r, c):
             return
 
 
+# write(text, alignment)
+# @Parameters: text, alignment
+# @Returns: None
+# Writes the text to the pdf
+
+
 def write(t, a):
     for x in t:
         pdf.cell(ln=3, h=6.5, align=a, w=0, txt=x, border=100)
@@ -330,19 +337,24 @@ file = root.tk.splitlist(files)
 # How far the cut off of the x Axis is
 cut = 3
 
+# Setting the cut off if the file starts with -
 try:
+    # Gets the first file name
     firstFile = os.path.splitext(os.path.basename(files[0]))[0]
+
+    # Checks if the first file starts with a - so it can set the cut off
     if firstFile.startswith('-'):
+        # Replaces the - with empty space and extracts the int
         firstFile.replace('-', '')
         cut = abs(int(firstFile))
         files = files[1:]
 except IndexError:
-    print("exit")
     exit(1)
 
 
 for f in files:
 
+    # Opens the file
     file = open(f, 'r')
 
     # Dict of printed phases
@@ -400,8 +412,8 @@ for f in files:
 
     # Normalising the y axis to max of 1
     normIntensity = []
-    for i in intensity:
-        normIntensity.append((i - min(intensity)) / (max(intensity) - min(intensity)))
+    for inte in intensity:
+        normIntensity.append((inte - min(intensity)) / (max(intensity) - min(intensity)))
 
     # Plotting with thin line width
     plt.plot(angle, normIntensity, linewidth=0.75)
@@ -431,6 +443,8 @@ for f in files:
     # The title of the pdf
     pdf.set_font("Times", "BU", 12)
     write(title, 'C')
+
+    # Adds a line spacing
     pdf.set_font('Times', "", 18.0)
     write(newLine, 'L')
 
@@ -453,19 +467,24 @@ for f in files:
     # Save the figure
     fig.savefig('page1.pdf')
 
+    # Saves the result pdf
     pdf.output('page2.pdf', 'F')
 
+    # List of pdfs for merging
     pdfs = ['page1.pdf', 'page2.pdf']
 
     pdf.close()
 
+    # Adds the 2 pdfs together
     for pdf in pdfs:
         merger.append(pdf)
 
+    # Deletes the pdfs
     for pdf in pdfs:
         os.remove(pdf)
 
 
+# Saves the merged file with the set save file name
 merger.write(saveFile)
 
 merger.close()

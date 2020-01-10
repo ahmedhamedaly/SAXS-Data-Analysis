@@ -8,13 +8,13 @@ from fpdf import FPDF
 from PyPDF2 import PdfFileMerger
 
 
-# peaks = peak(angle, intensity, resolution)
-# @Parameters: angle, intensity, resolution
+# peaks = peak(angle, intensity, resolution, normIntensity)
+# @Parameters: angle, intensity, resolution, normalised intensity
 # @Returns: peakList
 # Finds the peaks and adds them to a list
 
 
-def peak(a, i, r):
+def peak(a, i, r, ni):
     peakList = []
     peakCoords = []
     for index in range(len(i)):
@@ -23,9 +23,10 @@ def peak(a, i, r):
             if i[index] > i[index - 1] > i[index - 2] > i[index - 3] > i[index - 4] and i[index] > i[index + 1] > i[index + 2] > i[index + 3] > i[index + 4]:
                 # Adds the peaks to a list
                 peakList.append((a[index], r[index]))
-                peakCoords.append((a[index], i[index]))
+                peakCoords.append((round(a[index], 2), round(ni[index], 2)))
         except IndexError:
             print("Peak fucked up...")
+
     return peakList, peakCoords
 
 
@@ -202,8 +203,8 @@ def meanAndStd(lp, r, c):
     for key, value in lp.items():
         if printed[key] == 0 and len(value) >= 3 and key != 'h':
             printed[key] = 1
-            a = round(statistics.mean(value), 3)
-            s = round(statistics.stdev(value), 3)
+            a = round(statistics.mean(value), 2)
+            s = round(statistics.stdev(value), 2)
             text.append(f"Ratio: {r}")
             text.append(f"phase: {key}")
             text.append(f"Average: {a}")
@@ -225,8 +226,8 @@ def meanAndStd(lp, r, c):
     for key, value in lp.items():
         if printed[key] == 0 and len(value) == 3 and key == 'h':
             printed[key] = 1
-            a = round(statistics.mean(value), 3)
-            s = round(statistics.stdev(value), 3)
+            a = round(statistics.mean(value), 2)
+            s = round(statistics.stdev(value), 2)
             text.append(f"Ratio: {r}")
             text.append(f"phase: {key}")
             text.append(f"Average: {a}")
@@ -246,8 +247,8 @@ def meanAndStd(lp, r, c):
             return
         elif printed[key] == 0 and len(value) == 2 and key == 'l':
             printed[key] = 1
-            a = round(statistics.mean(value), 3)
-            s = round(statistics.stdev(value), 3)
+            a = round(statistics.mean(value), 2)
+            s = round(statistics.stdev(value), 2)
             text.append(f"Ratio: {r}")
             text.append(f"phase: {key}")
             text.append(f"Average: {a}")
@@ -335,7 +336,7 @@ files = filedialog.askopenfilenames(parent=root, title='Choose a file', filetype
 file = root.tk.splitlist(files)
 
 # How far the cut off of the x Axis is
-cut = 3
+cut = 2.5
 
 # Setting the cut off if the file starts with -
 try:
@@ -420,7 +421,8 @@ for f in files:
     # plt.plot(angle, intensity, linewidth=0.75)
 
     # Labeling axis
-    plt.title("Angle (2Θ) vs Intensity")
+    # TODO
+    plt.title("9.9  0mMGDN  20to0degC  T296.01K  [23degC]")
     plt.xlabel("Angle (2Θ)")
     plt.ylabel("Intensity")
 
@@ -431,7 +433,7 @@ for f in files:
     # plt.show()
 
     # Determine the peaks given the angle, intensity and resolution and coords of them
-    peaks, coordPeaks = peak(angle, intensity, resolution)
+    peaks, coordPeaks = peak(angle, intensity, resolution, normIntensity)
 
     # Determine the 3 ratios given the peaks
     ratios1, ratios2, ratios3, coordPeak1, coordPeak2, coordPeak3 = ratio(peaks, coordPeaks)

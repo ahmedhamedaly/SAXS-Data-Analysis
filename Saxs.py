@@ -219,7 +219,7 @@ def meanAndStd(lp, r, c):
             for coord, lps in zip(coordsList, value):
                 pdf.cell(ln=3, h=6.5, align=a, w=0, txt=coord + " : " + str(round(lps, 2)), border=100)
 
-            pdf.set_font('Times', "", 18.0)
+            pdf.set_font('Times', "", 16)
             write(newLine, 'L')
 
             return
@@ -242,7 +242,7 @@ def meanAndStd(lp, r, c):
             for coord, lps in zip(coordsList, value):
                 pdf.cell(ln=3, h=6.5, align=a, w=0, txt=coord + " : " + str(lps), border=100)
 
-            pdf.set_font('Times', "", 18.0)
+            pdf.set_font('Times', "", 16)
             write(newLine, 'L')
 
             return
@@ -263,7 +263,7 @@ def meanAndStd(lp, r, c):
             for coord, lps in zip(coordsList, value):
                 pdf.cell(ln=3, h=6.5, align=a, w=0, txt=coord + " : " + str(lps), border=100)
 
-            pdf.set_font('Times', "", 18.0)
+            pdf.set_font('Times', "", 16)
             write(newLine, 'L')
 
             return
@@ -453,7 +453,7 @@ for f in files:
     write(title, 'C')
 
     # Adds a line spacing
-    pdf.set_font('Times', "", 18.0)
+    pdf.set_font('Times', "", 16)
     write(newLine, 'L')
 
     # --------------------------------------------

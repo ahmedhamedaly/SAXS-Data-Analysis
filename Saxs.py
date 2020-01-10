@@ -3,6 +3,7 @@ import statistics
 import os
 import tkinter as tk
 import matplotlib.pyplot as plt
+import pytemperature
 from tkinter import filedialog
 from fpdf import FPDF
 from PyPDF2 import PdfFileMerger
@@ -206,7 +207,7 @@ def meanAndStd(lp, r, c):
             a = round(statistics.mean(value), 2)
             s = round(statistics.stdev(value), 2)
             text.append(f"Ratio: {r}")
-            text.append(f"phase: {key}")
+            text.append(f"Phase: {key}")
             text.append(f"Average: {a}")
             text.append(f"Standard Deviation: {s}")
             text.append(f"Peak Coordinates: ")
@@ -215,8 +216,8 @@ def meanAndStd(lp, r, c):
             write(text, 'L')
             pdf.set_font('Times', "", 12.0)
 
-            for coord in coordsList:
-                pdf.cell(ln=3, h=6.5, align=a, w=0, txt=coord, border=100)
+            for coord, lps in zip(coordsList, value):
+                pdf.cell(ln=3, h=6.5, align=a, w=0, txt=coord + " : " + str(round(lps, 2)), border=100)
 
             pdf.set_font('Times', "", 18.0)
             write(newLine, 'L')
@@ -229,7 +230,7 @@ def meanAndStd(lp, r, c):
             a = round(statistics.mean(value), 2)
             s = round(statistics.stdev(value), 2)
             text.append(f"Ratio: {r}")
-            text.append(f"phase: {key}")
+            text.append(f"Phase: {key}")
             text.append(f"Average: {a}")
             text.append(f"Standard Deviation: {s}")
             text.append(f"Peak Coordinates: ")
@@ -238,8 +239,8 @@ def meanAndStd(lp, r, c):
             write(text, 'L')
             pdf.set_font('Times', "", 12.0)
 
-            for coord in coordsList:
-                pdf.cell(ln=3, h=6.5, align=a, w=0, txt=coord, border=100)
+            for coord, lps in zip(coordsList, value):
+                pdf.cell(ln=3, h=6.5, align=a, w=0, txt=coord + " : " + str(lps), border=100)
 
             pdf.set_font('Times', "", 18.0)
             write(newLine, 'L')
@@ -250,7 +251,7 @@ def meanAndStd(lp, r, c):
             a = round(statistics.mean(value), 2)
             s = round(statistics.stdev(value), 2)
             text.append(f"Ratio: {r}")
-            text.append(f"phase: {key}")
+            text.append(f"Phase: {key}")
             text.append(f"Average: {a}")
             text.append(f"Standard Deviation: {s}")
             text.append(f"Peak Coordinates: ")
@@ -259,8 +260,8 @@ def meanAndStd(lp, r, c):
             write(text, 'L')
             pdf.set_font('Times', "", 12.0)
 
-            for coord in coordsList:
-                pdf.cell(ln=3, h=6.5, align=a, w=0, txt=coord, border=100)
+            for coord, lps in zip(coordsList, value):
+                pdf.cell(ln=3, h=6.5, align=a, w=0, txt=coord + " : " + str(lps), border=100)
 
             pdf.set_font('Times', "", 18.0)
             write(newLine, 'L')
@@ -420,9 +421,14 @@ for f in files:
     plt.plot(angle, normIntensity, linewidth=0.75)
     # plt.plot(angle, intensity, linewidth=0.75)
 
+    # Getting title
+    sn = nameFile.split('_')
+    k = float(sn[5].replace('T', '').replace('K', ''))
+    kToC = pytemperature.k2c(k)
+    plotTitle = sn[0] + "  " + sn[1] + "  " + sn[3] + "  " + sn[5] + "  " + '[' + str(round(kToC)) + 'degC' + ']'
+    plt.title(plotTitle)
+
     # Labeling axis
-    # TODO
-    plt.title("9.9  0mMGDN  20to0degC  T296.01K  [23degC]")
     plt.xlabel("Angle (2Θ)")
     plt.ylabel("Intensity")
 

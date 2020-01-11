@@ -175,20 +175,17 @@ def latticeParameter(p):
 
     # If n of the m ratios are available then phase present
     if len(p['pn3m']) >= 3:
-        for tu in p['pn3m']:
-            lp['pn3m'].append(tu[0] * tu[1])
+        lp['pn3m'] = [tu[0] * tu[1] for tu in p['pn3m']]
     if len(p['ia3d']) >= 3:
-        for tu in p['ia3d']:
-            lp['ia3d'].append(tu[0] * tu[1])
+        lp['ia3d'] = [tu[0] * tu[1] for tu in p['ia3d']]
     if len(p['l']) == 2:
-        for tu in p['l']:
-            lp['l'].append(tu[0] * tu[1])
+        lp['l'] = [tu[0] * tu[1] for tu in p['l']]
     if len(p['h']) == 3:
-        for tu in p['h']:
-            lp['h'].append(tu[0] * tu[1])
+        lp['h'] = [tu[0] * tu[1] for tu in p['h']]
     if len(p['fi']) == 1:
-        for tu in p['fi']:
-            lp['fi'].append(tu[0] * tu[1])
+        lp['fi'] = [tu[0] * tu[1] for tu in p['fi']]
+        # for tu in p['fi']:
+        #     lp['fi'].append(tu[0] * tu[1])
 
     return lp
 
@@ -413,9 +410,7 @@ for f in files:
     fig = plt.figure()
 
     # Normalising the y axis to max of 1
-    normIntensity = []
-    for inte in intensity:
-        normIntensity.append((inte - min(intensity)) / (max(intensity) - min(intensity)))
+    normIntensity = [(inte - min(intensity)) / (max(intensity) - min(intensity)) for inte in intensity]
 
     # Plotting with thin line width
     plt.plot(angle, normIntensity, linewidth=0.75)
@@ -423,9 +418,20 @@ for f in files:
 
     # Getting title
     sn = nameFile.split('_')
-    k = float(sn[5].replace('T', '').replace('K', ''))
-    kToC = pytemperature.k2c(k)
-    plotTitle = sn[0] + "  " + sn[1] + "  " + sn[3] + "  " + sn[5] + "  " + '[' + str(round(kToC)) + 'degC' + ']'
+
+    plotTitle = "Angle (2Θ) vs Intensity"
+    try:
+        k = float(sn[5].replace('T', '').replace('K', ''))
+        kToC = pytemperature.k2c(k)
+        plotTitle = sn[0] + "  " + sn[1] + "  " + sn[3] + "  " + sn[5] + "  " + '[' + str(round(kToC)) + 'degC' + ']'
+    except ValueError:
+        try:
+            k = float(sn[3].replace('T', '').replace('K', ''))
+            kToC = pytemperature.k2c(k)
+            plotTitle = sn[0] + "  " + sn[1] + "  " + sn[2] + "  " + '[' + str(round(kToC)) + 'degC' + ']'
+        except ValueError:
+            pass
+
     plt.title(plotTitle)
 
     # Labeling axis

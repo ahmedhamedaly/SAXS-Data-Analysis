@@ -490,6 +490,7 @@ for f in files:
     # List of pdfs for merging
     pdfs = ['page1.pdf', 'page2.pdf']
 
+    plt.close(fig)
     pdf.close()
 
     # Adds the 2 pdfs together

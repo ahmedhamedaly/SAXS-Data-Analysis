@@ -4,6 +4,7 @@ import os
 import tkinter as tk
 import matplotlib.pyplot as plt
 import pytemperature
+import numpy as np
 from tkinter import filedialog
 from fpdf import FPDF
 from PyPDF2 import PdfFileMerger
@@ -438,6 +439,8 @@ for f in files:
     plt.xlabel("Angle (2Θ)")
     plt.ylabel("Intensity")
 
+    plt.xticks(np.arange(0, cut + 0.2, 0.2).tolist())
+    plt.yticks(np.arange(0, 1.1, 0.1).tolist())
     # Show grid
     plt.grid(True)
 

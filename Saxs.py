@@ -5,6 +5,8 @@ import tkinter as tk
 import matplotlib.pyplot as plt
 import pytemperature
 import numpy as np
+import datetime as dt
+import tkinter.messagebox
 from tkinter import filedialog
 from fpdf import FPDF
 from PyPDF2 import PdfFileMerger
@@ -335,7 +337,13 @@ files = filedialog.askopenfilenames(parent=root, title='Choose a file', filetype
 file = root.tk.splitlist(files)
 
 # How far the cut off of the x Axis is
-cut = 2.5
+cut = 3
+
+# Current time
+currentTime = dt.datetime.now()
+
+# PDFS to Delete
+pdfDelete = []
 
 # Setting the cut off if the file starts with -
 try:
@@ -378,7 +386,7 @@ for f in files:
 
     # Determines the name of the save file
     if len(files) > 1:
-        saveFile = dirFile + '/' + 'Result.pdf'
+        saveFile = dirFile + '/' + str(currentTime.day) + '-' + str(currentTime.month) + '-' + str(currentTime.year) + '_' + str(currentTime.hour) + '-' + str(currentTime.minute) + '-' + str(currentTime.second) + '_Result.pdf'
     else:
         saveFile = dirFile + '/' + nameFile + '_Result.pdf'
 
@@ -439,8 +447,9 @@ for f in files:
     plt.xlabel("Angle (2Θ)")
     plt.ylabel("Intensity")
 
-    plt.xticks(np.arange(0, cut + 0.2, 0.2).tolist())
-    plt.yticks(np.arange(0, 1.1, 0.1).tolist())
+    if cut == 3:
+        plt.xticks(np.arange(0, cut + 0.2, 0.2).tolist())
+        plt.yticks(np.arange(0, 1.1, 0.1).tolist())
     # Show grid
     plt.grid(True)
 
@@ -481,25 +490,30 @@ for f in files:
 
     # --------------------------------------------
 
+    # Name of the file
+    file1 = dirFile + '/' + nameFile + 'page1.pdf'
+    file2 = dirFile + '/' + nameFile + 'page2.pdf'
+
     # Save the figure
-    fig.savefig('page1.pdf')
+    fig.savefig(file1)
 
     # Saves the result pdf
-    pdf.output('page2.pdf', 'F')
+    pdf.output(file2)
+
+    # Adds the files to the bin list
+    pdfDelete.append(file1)
+    pdfDelete.append(file2)
 
     # List of pdfs for merging
-    pdfs = ['page1.pdf', 'page2.pdf']
+    pdfs = [file1, file2]
 
     plt.close(fig)
     pdf.close()
+    file.close()
 
     # Adds the 2 pdfs together
     for pdf in pdfs:
         merger.append(pdf)
-
-    # Deletes the pdfs
-    for pdf in pdfs:
-        os.remove(pdf)
 
 
 # Saves the merged file with the set save file name
@@ -507,4 +521,9 @@ merger.write(saveFile)
 
 merger.close()
 
+# Deletes the pdfs
+for pdf in pdfDelete:
+    os.remove(pdf)
+
 print("done")
+# tk.messagebox.showinfo("Task Complete", "Successfully completed the task")

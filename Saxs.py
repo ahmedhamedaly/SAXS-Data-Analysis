@@ -240,7 +240,7 @@ def meanAndStd(lp, r, c):
             pdf.set_font('Times', "", 12.0)
 
             for coord, lps in zip(coordsList, value):
-                pdf.cell(ln=3, h=6.5, align=a, w=0, txt=coord + " : " + str(lps), border=100)
+                pdf.cell(ln=3, h=6.5, align=a, w=0, txt=coord + " : " + str(round(lps, 2)), border=100)
 
             pdf.set_font('Times', "", 16)
             write(newLine, 'L')
@@ -261,7 +261,7 @@ def meanAndStd(lp, r, c):
             pdf.set_font('Times', "", 12.0)
 
             for coord, lps in zip(coordsList, value):
-                pdf.cell(ln=3, h=6.5, align=a, w=0, txt=coord + " : " + str(lps), border=100)
+                pdf.cell(ln=3, h=6.5, align=a, w=0, txt=coord + " : " + str(round(lps, 2)), border=100)
 
             pdf.set_font('Times', "", 16)
             write(newLine, 'L')
